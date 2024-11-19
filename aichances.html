@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Университетский калькулятор поступления</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 50px;
+            background-color: #f0f0f0;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+        .container {
+            max-width: 400px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .recommendations {
+            max-width: 300px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="number"] {
+            width: 100%;
+            padding: 8px;
+            box-sizing: border-box;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .result {
+            margin-top: 20px;
+        }
+        .recommendation-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .recommendation-list li {
+            margin-bottom: 10px;
+            padding: 10px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>Калькулятор шанса поступления</h2>
+        <div class="form-group">
+            <label for="sat">SAT:</label>
+            <input type="number" id="sat" placeholder="Введите SAT балл">
+        </div>
+        <div class="form-group">
+            <label for="ielts">IELTS:</label>
+            <input type="number" id="ielts" step="0.1" placeholder="Введите IELTS балл">
+        </div>
+        <div class="form-group">
+            <label for="gpa">GPA:</label>
+            <input type="number" id="gpa" step="0.1" placeholder="Введите GPA">
+        </div>
+        <button onclick="calculateChance()">Рассчитать шанс</button>
+        <div class="result" id="result"></div>
+    </div>
+
+    <div class="recommendations">
+        <h3>Рекомендуемые университеты</h3>
+        <ul class="recommendation-list" id="recommendations"></ul>
+    </div>
+
+    <script>
+        function calculateChance() {
+            const sat = parseFloat(document.getElementById("sat").value);
+            const ielts = parseFloat(document.getElementById("ielts").value);
+            const gpa = parseFloat(document.getElementById("gpa").value);
+
+            if (isNaN(sat) || isNaN(ielts) || isNaN(gpa)) {
+                document.getElementById("result").innerHTML = "Пожалуйста, введите все значения.";
+                return;
+            }
+
+            fetch('http://127.0.0.1:5000/predict', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ SAT: sat, IELTS: ielts, GPA: gpa })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.error) {
+                    document.getElementById("result").innerHTML = data.error;
+                } else {
+                    document.getElementById("result").innerHTML = "Шанс поступления: " + data.admission_chance.toFixed(2) + "%";
+
+                    // Обновление списка университетов
+                    const recommendationsList = document.getElementById("recommendations");
+                    recommendationsList.innerHTML = ""; // Очистить предыдущие результаты
+                    if (data.recommended_universities && data.recommended_universities.length > 0) {
+                        data.recommended_universities.forEach(university => {
+                            const li = document.createElement("li");
+                            li.textContent = university;
+                            recommendationsList.appendChild(li);
+                        });
+                    } else {
+                        const li = document.createElement("li");
+                        li.textContent = "Нет рекомендаций.";
+                        recommendationsList.appendChild(li);
+                    }
+                }
+            })
+            .catch(error => {
+                document.getElementById("result").innerHTML = "Ошибка при расчете шанса.";
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</body>
+</html>

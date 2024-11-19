@@ -1,0 +1,32 @@
+[
+    {
+        "name": "Massachusetts Institute of Technology",
+        "min_sat": 1500,
+        "min_ielts": 7.5,
+        "min_gpa": 3.8
+    },
+    {
+        "name": "Stanford University",
+        "min_sat": 1450,
+        "min_ielts": 7.0,
+        "min_gpa": 3.7
+    },
+    {
+        "name": "Harvard University",
+        "min_sat": 1500,
+        "min_ielts": 8.0,
+        "min_gpa": 3.9
+    },
+    {
+        "name": "University of Cambridge",
+        "min_sat": 1400,
+        "min_ielts": 7.0,
+        "min_gpa": 3.6
+    },
+    {
+        "name": "Nazarbayev university",
+        "min_sat": 1400,
+        "min_ielts": 7.0,
+        "min_gpa": 3.6
+    }
+]
